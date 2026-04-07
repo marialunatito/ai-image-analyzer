@@ -1,9 +1,111 @@
 # AI Image Analyzer
 
-This project is a full-stack web application that allows users to upload an image, analyzes it using an AI service, and displays descriptive tags of the content. It includes a Go backend (Clean Architecture), React frontend, Docker containers, testing, and best practices.
+Aplicacion full-stack para cargar una imagen, analizar su contenido con IA y mostrar etiquetas con su nivel de confianza.
 
-## Progress
+## Tecnologias
 
-- [x] Project setup
-- [ ] Backend
-- [ ] Frontend
+- Backend: Go 1.22 + Gin
+- Frontend: React 18 + Vite 5
+- Contenerizacion: Docker + Docker Compose
+- Web server frontend: Nginx (SPA + proxy a backend)
+
+## Estructura
+
+```text
+.
+├── backend
+│   ├── cmd/api/main.go
+│   ├── internal/
+│   ├── test/
+│   └── Dockerfile
+├── frontend
+│   ├── src/
+│   ├── Dockerfile
+│   ├── nginx.conf
+│   └── package.json
+└── docker-compose.yml
+```
+
+## Variables de entorno
+
+### Backend
+
+Archivo: `backend/.env` (puedes copiar desde `backend/.env.example`)
+
+- `PORT`: puerto del backend (default `8080`)
+- `IA_API_KEY`: API key del proveedor de IA
+- `IA_API_URL`: URL del proveedor de IA
+- `MAX_IMAGE_SIZE`: tamano maximo permitido en bytes (default `5242880`)
+
+### Frontend
+
+Archivo: `frontend/.env` (puedes copiar desde `frontend/.env.example`)
+
+- `VITE_API_BASE_URL`: base URL del backend. En local puedes dejarlo vacio para usar el proxy de Vite
+- `VITE_MAX_IMAGE_SIZE_MB`: tamano maximo de archivo en MB para validacion en cliente (default `5`)
+
+## Ejecutar local (sin Docker)
+
+### 1) Backend
+
+```bash
+cd backend
+go mod tidy
+go run ./cmd/api
+```
+
+Backend disponible en `http://localhost:8080`.
+
+### 2) Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend disponible en `http://localhost:5173`.
+
+## Ejecutar con Docker Compose
+
+Desde la raiz del proyecto:
+
+```bash
+docker compose up --build
+```
+
+- Frontend: `http://localhost:3000`
+- Backend: `http://localhost:8080`
+
+Detener servicios:
+
+```bash
+docker compose down
+```
+
+## Endpoint principal
+
+`POST /api/analyze`
+
+- Content-Type: `multipart/form-data`
+- Campo esperado: `image`
+
+Respuesta esperada:
+
+```json
+{
+ "tags": [
+  { "label": "Perro", "confidence": 0.98 },
+  { "label": "Parque", "confidence": 0.91 }
+ ]
+}
+```
+
+## Buenas practicas aplicadas
+
+- Variables de entorno para configuracion sensible
+- Separacion de responsabilidades en frontend (componentes, servicio API, utilidades)
+- Validacion de tipo y tamano de archivo en cliente
+- Manejo de estados UX: loading, error, success
+- UI responsiva para desktop y mobile
+- Contenerizacion de frontend y backend para ejecucion reproducible
