@@ -1,0 +1,45 @@
+# Go
+/backend/bin/
+/backend/pkg/
+/backend/coverage.out
+/backend/.env
+/backend/.env.*
+/backend/.DS_Store
+/backend/.vscode/
+/backend/.idea/
+/backend/.cache/
+/backend/.test/
+/backend/.log
+/backend/tmp/
+/backend/.local/
+/backend/.toolstmp/
+
+# General
+.DS_Store
+.env
+.env.*
+.vscode/
+.idea/
+*.log
+*.tmp
+*.local
+*.swp
+*.swo
+*.bak
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docker
+**/docker-compose.override.yml
+**/Dockerfile.local
+
+# Test/coverage
+coverage/
+*.lcov
+*.coverage
+
+# System
+Thumbs.db
+
+!.env.example
