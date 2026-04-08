@@ -33,8 +33,8 @@ Aplicacion full-stack para cargar una imagen, analizar su contenido con IA y mos
 Archivo: `backend/.env` (puedes copiar desde `backend/.env.example`)
 
 - `PORT`: puerto del backend (default `8080`)
-- `IA_API_KEY`: API key del proveedor de IA
-- `IA_API_URL`: URL del proveedor de IA
+- `GCV_API_KEY`: API key de Google Cloud Vision
+- `GCV_API_URL`: URL de Google Cloud Vision (default `https://vision.googleapis.com/v1/images:annotate`)
 - `MAX_IMAGE_SIZE`: tamano maximo permitido en bytes (default `5242880`)
 
 ### Frontend
@@ -43,28 +43,6 @@ Archivo: `frontend/.env` (puedes copiar desde `frontend/.env.example`)
 
 - `VITE_API_BASE_URL`: base URL del backend. En local puedes dejarlo vacio para usar el proxy de Vite
 - `VITE_MAX_IMAGE_SIZE_MB`: tamano maximo de archivo en MB para validacion en cliente (default `5`)
-
-## Ejecutar local (sin Docker)
-
-### 1) Backend
-
-```bash
-cd backend
-go mod tidy
-go run ./cmd/api
-```
-
-Backend disponible en `http://localhost:8080`.
-
-### 2) Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Frontend disponible en `http://localhost:5173`.
 
 ## Ejecutar con Docker Compose
 
