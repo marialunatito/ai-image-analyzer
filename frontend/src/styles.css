@@ -103,8 +103,23 @@ h2 {
   transition: background-color 140ms ease;
 }
 
+.actions-row {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.upload-form button.secondary {
+  background: #eef2ef;
+  color: #2f3a35;
+}
+
 .upload-form button:hover:enabled {
   background: var(--primary-strong);
+}
+
+.upload-form button.secondary:hover:enabled {
+  background: #dce5e0;
 }
 
 .upload-form button:disabled {
