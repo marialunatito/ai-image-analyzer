@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import ImageUploadForm from "./components/ImageUploadForm";
 import PreviewCard from "./components/PreviewCard";
 import StatusMessage from "./components/StatusMessage";
 import TagsList from "./components/TagsList";
-import { analyzeImage } from "./services/api";
+import { ApiError, analyzeImage } from "./services/api";
 
 const DEFAULT_MAX_SIZE_MB = Number(import.meta.env.VITE_MAX_IMAGE_SIZE_MB || 5);
 const ALLOWED_MIME_TYPES = [
@@ -31,6 +31,7 @@ function validateImage(file, maxSizeMB) {
 }
 
 export default function App() {
+  const abortControllerRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
   const [tags, setTags] = useState([]);
@@ -74,6 +75,12 @@ export default function App() {
     setSelectedFile(file);
   }
 
+  function handleCancel() {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
 
@@ -88,16 +95,20 @@ export default function App() {
       setIsLoading(true);
       setError("");
       setInfo("Analizando imagen, por favor espera...");
+      abortControllerRef.current = new AbortController();
 
-      const result = await analyzeImage(selectedFile);
+      const result = await analyzeImage(selectedFile, {
+        signal: abortControllerRef.current.signal
+      });
       setTags(result.tags);
       setInfo(result.tags.length ? "Analisis completado." : "No se detectaron etiquetas.");
     } catch (requestError) {
       setTags([]);
       setInfo("");
-      setError(requestError.message || "No fue posible analizar la imagen.");
+      setError(resolveErrorMessage(requestError));
     } finally {
       setIsLoading(false);
+      abortControllerRef.current = null;
     }
   }
 
@@ -117,6 +128,7 @@ export default function App() {
           selectedFile={selectedFile}
           onFileChange={handleFileChange}
           onSubmit={handleSubmit}
+          onCancel={handleCancel}
           maxSizeMB={maxSizeMB}
         />
 
@@ -132,4 +144,25 @@ export default function App() {
       </section>
     </main>
   );
+}
+
+function resolveErrorMessage(error) {
+  if (!(error instanceof ApiError)) {
+    return error?.message || "No fue posible analizar la imagen.";
+  }
+
+  switch (error.code) {
+    case "CANCELED":
+      return "Analisis cancelado.";
+    case "TIMEOUT":
+      return "La IA tardo demasiado. Intenta con otra imagen o vuelve a intentar.";
+    case "INVALID_IMAGE":
+    case "INVALID_REQUEST":
+    case "PAYLOAD_TOO_LARGE":
+      return error.message;
+    case "PROVIDER_ERROR":
+      return "El proveedor de IA no esta disponible en este momento.";
+    default:
+      return error.message || "No fue posible analizar la imagen.";
+  }
 }

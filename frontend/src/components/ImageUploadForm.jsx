@@ -3,6 +3,7 @@ export default function ImageUploadForm({
   selectedFile,
   onFileChange,
   onSubmit,
+  onCancel,
   maxSizeMB
 }) {
   return (
@@ -22,9 +23,16 @@ export default function ImageUploadForm({
         Formatos permitidos: JPG, JPEG, PNG, WEBP. Maximo {maxSizeMB} MB.
       </p>
 
-      <button type="submit" disabled={!selectedFile || isLoading}>
-        {isLoading ? "Analizando..." : "Analizar"}
-      </button>
+      <div className="actions-row">
+        <button type="submit" disabled={!selectedFile || isLoading}>
+          {isLoading ? "Analizando..." : "Analizar"}
+        </button>
+        {isLoading && (
+          <button type="button" className="secondary" onClick={onCancel}>
+            Cancelar
+          </button>
+        )}
+      </div>
     </form>
   );
 }
