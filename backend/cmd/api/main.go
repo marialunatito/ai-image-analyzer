@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	_ "github.com/marialuna/prueba_tecnica/ai-image-analyzer/backend/api"
 	"github.com/marialuna/prueba_tecnica/ai-image-analyzer/backend/internal/config"
 	"github.com/marialuna/prueba_tecnica/ai-image-analyzer/backend/internal/router"
 	"github.com/marialuna/prueba_tecnica/ai-image-analyzer/backend/internal/service"
@@ -26,6 +27,10 @@ var (
 	}
 )
 
+// @title AI Image Analyzer API
+// @version 1.0
+// @description API para analizar imagenes usando un proveedor de IA.
+// @BasePath /
 func main() {
 	if err := run(); err != nil {
 		log.Fatalf("%v", err)

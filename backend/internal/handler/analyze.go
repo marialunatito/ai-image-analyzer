@@ -9,8 +9,16 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/marialuna/prueba_tecnica/ai-image-analyzer/backend/internal/apperrors"
+	"github.com/marialuna/prueba_tecnica/ai-image-analyzer/backend/internal/entity"
 	"github.com/marialuna/prueba_tecnica/ai-image-analyzer/backend/internal/usecase"
 )
+
+type AnalyzeResponse = entity.AnalyzeResult
+
+type ErrorResponse struct {
+	Message string `json:"message"`
+	Code    string `json:"code"`
+}
 
 var allowedMIMETypes = map[string]struct{}{
 	"image/png":  {},
@@ -19,6 +27,21 @@ var allowedMIMETypes = map[string]struct{}{
 	"image/webp": {},
 }
 
+// AnalyzeHandler godoc
+// @Summary Analizar imagen
+// @Description Recibe una imagen y devuelve etiquetas de contenido con su confianza.
+// @Tags analyze
+// @Accept mpfd
+// @Produce json
+// @Param image formData file true "Archivo de imagen"
+// @Success 200 {object} AnalyzeResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 413 {object} ErrorResponse
+// @Failure 415 {object} ErrorResponse
+// @Failure 502 {object} ErrorResponse
+// @Failure 504 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /api/analyze [post]
 func AnalyzeHandler(analyzeUseCase usecase.AnalyzeImageUseCase, maxImageSize int64) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		fileHeader, err := c.FormFile("image")

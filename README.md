@@ -101,6 +101,18 @@ cd backend
 go test -cover ./...
 ```
 
+## Swagger
+
+- UI: `http://localhost:8080/swagger/index.html`
+- Especificacion generada: `backend/api/swagger.yaml` y `backend/api/swagger.json`
+
+Generar o actualizar documentación:
+
+```bash
+cd backend
+go run github.com/swaggo/swag/cmd/swag@v1.16.2 init -g cmd/api/main.go -o api --parseInternal
+```
+
 ## Buenas practicas aplicadas
 
 - Variables de entorno para configuracion sensible
