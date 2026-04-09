@@ -79,6 +79,28 @@ Respuesta esperada:
 }
 ```
 
+## Cobertura de pruebas (backend)
+
+- Componentes criticos (objetivo minimo: 80%):
+  - `internal/handler`: 91.8%
+  - `internal/service`: 91.8%
+
+Verificar componentes criticos:
+
+```bash
+cd backend
+go test --count=1 -cover ./internal/handler ./internal/service
+```
+
+- Componentes opcionales (referencia): resto de paquetes del backend.
+
+Verificar cobertura global opcional:
+
+```bash
+cd backend
+go test -cover ./...
+```
+
 ## Buenas practicas aplicadas
 
 - Variables de entorno para configuracion sensible

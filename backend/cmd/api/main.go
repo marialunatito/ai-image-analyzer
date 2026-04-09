@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"time"
 
 	"github.com/marialuna/prueba_tecnica/ai-image-analyzer/backend/internal/config"
 	"github.com/marialuna/prueba_tecnica/ai-image-analyzer/backend/internal/router"
@@ -9,22 +11,45 @@ import (
 	"github.com/marialuna/prueba_tecnica/ai-image-analyzer/backend/internal/usecase"
 )
 
+type runnableServer interface {
+	Run(addr ...string) error
+}
+
+var (
+	loadConfig = config.Load
+	newVisionService = func(apiKey, apiURL string, timeout time.Duration, maxResults int) service.IAService {
+		return service.NewGoogleVisionService(apiKey, apiURL, timeout, maxResults)
+	}
+	newAnalyzeImageUseCase = usecase.NewAnalyzeImageUseCase
+	setupHTTPRouter = func(analyzeUseCase usecase.AnalyzeImageUseCase, maxImageSize int64) runnableServer {
+		return router.SetupRouter(analyzeUseCase, maxImageSize)
+	}
+)
+
 func main() {
-	cfg, err := config.Load()
+	if err := run(); err != nil {
+		log.Fatalf("%v", err)
+	}
+}
+
+func run() error {
+	cfg, err := loadConfig()
 	if err != nil {
-		log.Fatalf("error loading configuration: %v", err)
+		return fmt.Errorf("error loading configuration: %w", err)
 	}
 
-	visionService := service.NewGoogleVisionService(
+	visionService := newVisionService(
 		cfg.Vision.APIKey,
 		cfg.Vision.APIURL,
 		cfg.Vision.Timeout,
 		cfg.Vision.MaxResults,
 	)
-	analyzeUseCase := usecase.NewAnalyzeImageUseCase(visionService)
+	analyzeUseCase := newAnalyzeImageUseCase(visionService)
 
-	r := router.SetupRouter(analyzeUseCase, cfg.MaxImageSize)
+	r := setupHTTPRouter(analyzeUseCase, cfg.MaxImageSize)
 	if err := r.Run(":" + cfg.Port); err != nil {
-		log.Fatalf("error running server: %v", err)
+		return fmt.Errorf("error running server: %w", err)
 	}
+
+	return nil
 }
